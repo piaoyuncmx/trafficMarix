@@ -23,10 +23,10 @@ public class SyslogMapReduce {
 			System.out.println("CollectionName: "+s);
 		}
 		DBCollection col = db.getCollection("panabit_20110817");
-		DBCursor ite = col.find();
-		System.out.println(ite.next());
-		System.out.println(ite.next());
-		System.out.println(ite.next());
+//		DBCursor ite = col.find();
+//		System.out.println(ite.next());
+//		System.out.println(ite.next());
+//		System.out.println(ite.next());
 //		int count = 0;
 //		while (ite.hasNext()){
 //			System.out.println(ite.next());
@@ -34,25 +34,26 @@ public class SyslogMapReduce {
 //		}
 //		System.out.println( count );
 		String mapFunc = "function(){emit({srcgroup:this.srcgroup, dstgroup:this.dstgroup, app:this.app}, " +
-				"{traffic:{inbyte:this.traffic[0].inByte, outbyte:this.traffic[0].outByte, conn:1}})}";
-		String reduceFunc = "function(key, vals){var n = {inbyte:0, outbyte:0, conn:0};" +
+				"{traffic:{inbyte:this.traffic[0].inByte, outbyte:this.traffic[0].outByte,totalbyte:0,conn:1}})}";
+		String reduceFunc = "function(key, vals){var n = {inbyte:0, outbyte:0, totalbyte:0,conn:0};" +
 				"for (var i in vals){" +
 				"n.inbyte += vals[i].traffic.inbyte;" +
 				"n.outbyte += vals[i].traffic.outbyte;" +
+			//	"n.totalbyte=n.inbyte+n.outbyte;"+
 				"n.conn += vals[i].traffic.conn;}" +
 				"return {\"traffic\":n}; }";
 		DBObject query = new BasicDBObject();
-//		query.put("traffic[0].time", new BasicDBObject("$gte", 1.3135512E9));
+		query.put("starttime",1.3135818E9);
 //		query.put("endtime", new BasicDBObject("$lte", 1.31346417E9));
 		long startTime=System.currentTimeMillis();
-		MapReduceOutput out = col.mapReduce(mapFunc, reduceFunc, "TrafficMatrix-1", query);
+		MapReduceOutput out = col.mapReduce(mapFunc, reduceFunc, "TrafficMatrix-2", query);
 		long endTime=System.currentTimeMillis(); 
 		int count = 0;
 	    for ( DBObject obj : out.results() ) {
 	         System.out.println( obj );
 	         count++;
 	     }
-	    System.out.println( (endTime-startTime)/1000 );
+	    System.out.println( (endTime-startTime)/1000+"s" );
 	    System.out.println( count );
 	      
 	}
