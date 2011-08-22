@@ -1,20 +1,30 @@
 package cn.edu.sjtu.syslogmapreduce;
 
 import java.net.UnknownHostException;
+import java.util.Iterator;
+
+import org.bson.types.Code;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.MapReduceCommand;
 import com.mongodb.MapReduceOutput;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.util.JSON;
 
 public class SyslogMapReduce {
+	public void PreTreatment(){
+		String code = "function PreTreatment(col){" +
+				"}";
+	}
+	
+	
 	public void FirstMapReduce(DBCollection col, double time){
-		/*first mapreduce,to grasp useful information and exchange srcGroup and dstGroup */		
+		/*first mapreduce */		
 
 		String mapFunc = "function(){if (this.srcgroup <= 11) " +
 				"emit({srcgroup:this.srcgroup, dstgroup:this.dstgroup, app:this.app}, " +
@@ -29,7 +39,7 @@ public class SyslogMapReduce {
 				"n.conn += vals[i].traffic.conn;}" +
 				"return {\"traffic\":n}; }";
 		DBObject query = new BasicDBObject();
-		query.put("traffic.0.time", time);
+		query.put("starttime", new BasicDBObject("$gte", time).append("$lt", time+600));
 //		long startTime=System.currentTimeMillis();
 		col.mapReduce(mapFunc, reduceFunc, "TrafficMatrix-1", query);
 //		long endTime=System.currentTimeMillis(); 
@@ -41,9 +51,9 @@ public class SyslogMapReduce {
 //	    System.out.println( (endTime-startTime)/1000+"s" );
 //	    System.out.println( count );
 	}
-
 	
-	public void AddKeyValues(DBCollection col){
+	
+	public void AddKeyValues(DBCollection col, double time){
 		/*add more key-values to TrafficMatrix-1*/		
   
 	    col.updateMulti(new BasicDBObject("_id.srcgroup", new BasicDBObject("$lte", 2)), 
@@ -72,6 +82,11 @@ public class SyslogMapReduce {
 				new BasicDBObject("$set", new BasicDBObject("app", "bt")));
 		col.updateMulti(new BasicDBObject("_id.app", "pplive"), 
 				new BasicDBObject("$set", new BasicDBObject("app", "pplive")));
+
+		DBCursor ite = col.find();
+		while (ite.hasNext()){
+			ite.next().put("time", time);
+		}
 	}
 	
 	
@@ -175,10 +190,10 @@ public class SyslogMapReduce {
 	}
 	
 	
-	public void ThirdMapReduce(DBCollection col, double time){
+	public void ThirdMapReduce(DBCollection col){
 		/*third mapreduce to caculate the percentage and form the last collection*/
 		
-		String UTCTime = String.valueOf(time);
+		//String UTCTime = String.valueOf(time);
 		String mapFunc = "function(){" +
 				"this.value.traffic.percentage = this.value.traffic.totalbyte/this.tototalbyte.value;" +
 				"emit({srcgroup:this._id.srcgroup, dstgroup:this._id.dstgroup}, {traffic:[this.value.traffic]}) }";
@@ -190,52 +205,82 @@ public class SyslogMapReduce {
 				"}" +
 				"return n; }";
 		DBObject query = new BasicDBObject();
-		col.mapReduce(mapFunc, reduceFunc, UTCTime, query);
+		col.mapReduce(mapFunc, reduceFunc, "TrafficMatrix", MapReduceCommand.OutputType.MERGE, query);
+	}
+	
+	
+	public void FormTheFinalCollection(DB db, DBCollection col){
+		String code = "function func(n){" +
+				"}";
+		DBCollection args = col;
+		db.doEval(code, args);
 	}
 	
 	
 	public static void main(String[] args) throws UnknownHostException, MongoException{
 		double curTime = System.currentTimeMillis()/1000;
 		double time = 1.3135914E9+Math.floor((curTime-1.3135914E9)/600-1)*600;
-		System.out.println(time);
+//		System.out.println(time);
 		
-		Mongo m = new Mongo("10.50.15.205");
+		String ipAddr = "10.50.15.210";
+		String dbName = "dbpanabit";
+		
+//		String ipAddr = args[0];
+//		String dbName = args[1];
+		
+		Mongo m = new Mongo(ipAddr);
 		for (String s : m.getDatabaseNames()){
 			System.out.println("DBName: "+s);
 		}
-		DB db = m.getDB("dbpanabit");
+		DB db = m.getDB(dbName);
 		for (String s : db.getCollectionNames()){
 			System.out.println("CollectionName: "+s);
 		}
 			
-		SyslogMapReduce smr = new SyslogMapReduce();
-		
-		DBCollection col = db.getCollection("panabit_20110817");
-		smr.FirstMapReduce(col, time);
-		
-		col = db.getCollection("TrafficMatrix-1");
-		smr.AddKeyValues(col);
-		smr.SecondMapReduce(col);
-		
-		col = db.getCollection("TrafficMatrix-1-1");
-		smr.AllTotalbyteCaculation(col);
-		DBCollection col2 = db.getCollection("TrafficMatrix-1-1-1");
-		smr.AddAllTotalbyte(col, col2);
-		
-		smr.ThirdMapReduce(col, time);
-		
-		/*delete staging database*/
-		col = db.getCollection("TrafficMatrix-1");
-		col.drop();
-		col = db.getCollection("TrafficMatrix-1-1");
-		col.drop();
-		col = db.getCollection("TrafficMatrix-1-1-1");
-		col.drop();
-		
-		/*for test*/
-//		DBCollection col = db.getCollection("TrafficMatrix-1-1-2");
+//		DBCollection col = db.getCollection("trafficSyslog");
 //		DBCursor ite = col.find();
 //		System.out.println(ite.next());
+//		System.out.println(col.find(new BasicDBObject("starttime", new BasicDBObject("$gte", time).append("$lt", time+600))).count());
+		
+//		long startTime = System.currentTimeMillis();
+//		
+//		SyslogMapReduce smr = new SyslogMapReduce();
+//		
+//		smr.FirstMapReduce(col, 1.3138542E9);
+//		
+//		col = db.getCollection("TrafficMatrix-1");
+//		smr.AddKeyValues(col, time);
+//		smr.SecondMapReduce(col);
+//		
+//		col = db.getCollection("TrafficMatrix-1-1");
+//		smr.AllTotalbyteCaculation(col);
+//		DBCollection col2 = db.getCollection("TrafficMatrix-1-1-1");
+//		smr.AddAllTotalbyte(col, col2);
+//		
+//		smr.ThirdMapReduce(col);
+		
+//		col = db.getCollection("TrafficMatrix-1");
+//		col.drop();
+//		col = db.getCollection("TrafficMatrix-1-1");
+//		col.drop();
+//		col = db.getCollection("TrafficMatrix-1-1-1");
+//		col.drop();
+		
+//		long endTime = System.currentTimeMillis();
+//		System.out.println((endTime - startTime)/1000 + "s");
+	
+		
+		
+		
+		/*for test*/
+//		DBCollection col = db.getCollection("TrafficMatrix");
+//		DBCursor ite = col.find();
+//		DBObject temp = ite.next();
+//		System.out.println(temp);
+//		String cde ="function func(n){" +
+//				"return n.traffic[0].time;}";
+//		System.out.println(db.doEval(cde, temp));
+
 //		while (ite.hasNext()){
 //			System.out.println(ite.next());
 //		}
