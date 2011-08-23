@@ -1,11 +1,5 @@
-package cn.edu.sjtu.syslogmapreduce;
+package testonmongodb;
 
-<<<<<<< HEAD
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-=======
->>>>>>> 52e9630e409f73a76cb0be7f8fc13126aca5e2ba
 import java.net.UnknownHostException;
 import java.util.Iterator;
 
@@ -23,10 +17,6 @@ import com.mongodb.MongoException;
 import com.mongodb.util.JSON;
 
 public class SyslogMapReduce {
-<<<<<<< HEAD
-	
-=======
->>>>>>> 52e9630e409f73a76cb0be7f8fc13126aca5e2ba
 	public void PreTreatment(){
 		String code = "function PreTreatment(col){" +
 				"}";
@@ -228,36 +218,15 @@ public class SyslogMapReduce {
 	
 	
 	public static void main(String[] args) throws UnknownHostException, MongoException{
-<<<<<<< HEAD
-//		BufferedReader readin = new BufferedReader(new InputStreamReader(System.in));
-//		try {
-//			String[] read = readin.readLine().split(" ");
-//			
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-		
-=======
->>>>>>> 52e9630e409f73a76cb0be7f8fc13126aca5e2ba
 		double curTime = System.currentTimeMillis()/1000;
 		double time = 1.3135914E9+Math.floor((curTime-1.3135914E9)/600-1)*600;
 //		System.out.println(time);
 		
-<<<<<<< HEAD
-//		String ipAddr = "10.50.15.201";
-//		String dbName = "dbpanabit";
-		
-		String ipAddr = args[0];
-		String dbName = args[1];
-=======
 		String ipAddr = "10.50.15.210";
 		String dbName = "dbpanabit";
 		
 //		String ipAddr = args[0];
 //		String dbName = args[1];
->>>>>>> 52e9630e409f73a76cb0be7f8fc13126aca5e2ba
 		
 		Mongo m = new Mongo(ipAddr);
 		for (String s : m.getDatabaseNames()){
@@ -268,22 +237,13 @@ public class SyslogMapReduce {
 			System.out.println("CollectionName: "+s);
 		}
 			
-<<<<<<< HEAD
-		DBCollection col = db.getCollection("trafficSyslog");
-=======
 //		DBCollection col = db.getCollection("trafficSyslog");
->>>>>>> 52e9630e409f73a76cb0be7f8fc13126aca5e2ba
 //		DBCursor ite = col.find();
 //		System.out.println(ite.next());
 //		System.out.println(col.find(new BasicDBObject("starttime", new BasicDBObject("$gte", time).append("$lt", time+600))).count());
 		
-<<<<<<< HEAD
-		long startTime = System.currentTimeMillis();
-		
-=======
 //		long startTime = System.currentTimeMillis();
 //		
->>>>>>> 52e9630e409f73a76cb0be7f8fc13126aca5e2ba
 //		SyslogMapReduce smr = new SyslogMapReduce();
 //		
 //		smr.FirstMapReduce(col, 1.3138542E9);
@@ -306,13 +266,8 @@ public class SyslogMapReduce {
 //		col = db.getCollection("TrafficMatrix-1-1-1");
 //		col.drop();
 		
-<<<<<<< HEAD
-		long endTime = System.currentTimeMillis();
-		System.out.println((endTime - startTime)/1000 + "s");
-=======
 //		long endTime = System.currentTimeMillis();
 //		System.out.println((endTime - startTime)/1000 + "s");
->>>>>>> 52e9630e409f73a76cb0be7f8fc13126aca5e2ba
 	
 		
 		
