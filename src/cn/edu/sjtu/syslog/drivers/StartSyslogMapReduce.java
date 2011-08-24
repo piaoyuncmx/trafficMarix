@@ -40,7 +40,7 @@ public class StartSyslogMapReduce {
 		 */
 		switch(args.length) {
 		case 5:
-			time = Integer.parseInt(args[4]);	// the 5th param (opitional) is UTC time
+			time = Integer.parseInt(args[4]) / 600 * 600 - 600;	// the 5th param (opitional) is UTC time
 		case 4:
 			mongoIp = args[0];
 			mongoPort = Integer.parseInt(args[1]); // MongoDB Port
