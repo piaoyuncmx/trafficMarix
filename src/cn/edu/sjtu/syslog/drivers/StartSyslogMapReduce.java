@@ -49,7 +49,9 @@ public class StartSyslogMapReduce {
 		try {
 			/* Get current time, UTC, in seconds */
 			// TODO: correct the time
-			int time = (int) System.currentTimeMillis() / 1000;
+//			int time = (int) System.currentTimeMillis() / 1000;
+			double curTime = System.currentTimeMillis()/1000;
+			double time = 1.3135914E9+Math.floor((curTime-1.3135914E9)/600-1)*600;
 
 			/* Connect to MogonDB Database, Collection */
 			Mongo mongo = new Mongo(mongoIp, mongoPort);
@@ -57,7 +59,7 @@ public class StartSyslogMapReduce {
 			DBCollection mongoCollection = dbPanabit.getCollection(collectName);
 			
 			/* Call MapReduce Functions */
-			SyslogMapReduce.syslogMapReduce(mongoCollection, time);
+			SyslogMapReduce.syslogMapReduce(dbpanabit, mongoCollection, time);
 			
 		} catch (MongoException e) {
 			e.printStackTrace();
