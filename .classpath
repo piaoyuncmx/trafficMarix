@@ -2,6 +2,14 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="lib/mongo-2.6.3.jar"/>
+=======
+<<<<<<< HEAD
+	<classpathentry kind="lib" path="lib/mongo-2.6.3.jar"/>
+=======
+	<classpathentry kind="lib" path="G:/study/mongodb/mongo-2.6.3.jar"/>
+>>>>>>> 52e9630e409f73a76cb0be7f8fc13126aca5e2ba
+>>>>>>> 2f82e142fcb14d31a4322e032871d9d3cc214f9d
 	<classpathentry kind="output" path="bin"/>
 </classpath>
