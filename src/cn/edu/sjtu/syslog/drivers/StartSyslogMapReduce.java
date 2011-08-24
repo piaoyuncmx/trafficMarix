@@ -33,30 +33,38 @@ public class StartSyslogMapReduce {
 		int mongoPort = 27017; // MongoDB Database Port
 		String dbName = "dbpanabit"; // MongoDB Collection Name
 		String collectName = "traiffcSyslog"; // MongoDB Collection Name
-
+		double time = -1;	// current time in UTC seconds, the initial value is negative 
+		
 		/*
 		 * Get command line params
 		 */
-		if (args.length != 4) {
-			System.out.println("USAGE: java");
-		} else {
+		switch(args.length) {
+		case 5:
+			time = Integer.parseInt(args[4]);	// the 5th param (opitional) is UTC time
+		case 4:
 			mongoIp = args[0];
 			mongoPort = Integer.parseInt(args[1]); // MongoDB Port
 			dbName = args[2]; // MongoDB Database Name
 			collectName = args[3]; // MongoDB Collection
+			if (time < 0) {
+				time = ((int)System.currentTimeMillis()) / 1000 / 600 * 600 - 600;
+			}
+			break;
+		default:
+			System.out.println("Incorrect number of param.");
+			System.out.println("Usage: java -classpath ./bin:./lib/mongo-2.6.3.jar cn.edu.sjtu.syslog.drivers.StartSyslogMapReduce <MongoIP> <MongoPort> <DBName> <CollectName> [UTCSeconds]");
+			System.exit(-1);
 		}
 
-		try {
-			/* Get current time, UTC, in seconds */
-			// TODO: correct the time
-//			int time = (int) System.currentTimeMillis() / 1000;
-			double curTime = System.currentTimeMillis()/1000;
-			double time = 1.3135914E9+Math.floor((curTime-1.3135914E9)/600-1)*600;
 
+		try {
 			/* Connect to MogonDB Database, Collection */
 			Mongo mongo = new Mongo(mongoIp, mongoPort);
 			DB dbPanabit = mongo.getDB(dbName);
 			DBCollection mongoCollection = dbPanabit.getCollection(collectName);
+			
+			// TODO: Remove the debug output
+			System.out.println("Processing traffic starting at UTCSecond: " + time);
 			
 			/* Call MapReduce Functions */
 			SyslogMapReduce.syslogMapReduce(dbPanabit, mongoCollection, time);
