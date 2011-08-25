@@ -27,7 +27,7 @@ public class MapReduceAddTraffic {
 		// Step 1: Call 
 	}
 	
-	public static DBCollection addTraffic(DB dbpanabit, DBCollection dbcollection, double time) {
+	public static DBCollection addTraffic(DB dbpanabit, DBCollection dbCollection, double time) {
 		// TODO: Fullfill the functions
 		// Step 1 : Connect to temp collection
 		// Step 2 : Add Traffic
@@ -49,7 +49,7 @@ public class MapReduceAddTraffic {
 		DBObject query = new BasicDBObject();
 		query.put("starttime", new BasicDBObject("$lte", time+600));
 		query.put("endtime", new BasicDBObject("$gt", time));
-		dbcollection.mapReduce(mapFunc, reduceFunc, "TrafficMatrix-Agg", query);
+		dbCollection.mapReduce(mapFunc, reduceFunc, "TrafficMatrix-Agg", query);
 
 		DBCollection collAgg = dbpanabit.getCollection("TrafficMatrix-Agg");
 		return collAgg;

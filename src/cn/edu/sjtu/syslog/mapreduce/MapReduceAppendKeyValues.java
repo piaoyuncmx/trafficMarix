@@ -10,33 +10,33 @@ public class MapReduceAppendKeyValues {
 		
 	}
 	
-	public static DBCollection appendKeyValues(DB dbpanabit, DBCollection dbcollection){
+	public static DBCollection appendKeyValues(DB dbPanabit, DBCollection collAgg){
 		
-		dbcollection.updateMulti(new BasicDBObject("_id.srcgroup", new BasicDBObject("$lte", 2)), 
+		collAgg.updateMulti(new BasicDBObject("_id.srcgroup", new BasicDBObject("$lte", 2)), 
 				new BasicDBObject("$set", new BasicDBObject("srcgroup", "admin")));
-		dbcollection.updateMulti(new BasicDBObject("_id.srcgroup", new BasicDBObject("$lte", 6).append("$gt", 2)), 
+		collAgg.updateMulti(new BasicDBObject("_id.srcgroup", new BasicDBObject("$lte", 6).append("$gt", 2)), 
 				new BasicDBObject("$set", new BasicDBObject("srcgroup", "office")));
-		dbcollection.updateMulti(new BasicDBObject("_id.srcgroup", new BasicDBObject("$lte", 10).append("$gt", 6)), 
+		collAgg.updateMulti(new BasicDBObject("_id.srcgroup", new BasicDBObject("$lte", 10).append("$gt", 6)), 
 				new BasicDBObject("$set", new BasicDBObject("srcgroup", "dorm")));
-		dbcollection.updateMulti(new BasicDBObject("_id.srcgroup", 11), 
+		collAgg.updateMulti(new BasicDBObject("_id.srcgroup", 11), 
 				new BasicDBObject("$set", new BasicDBObject("srcgroup", "wireless")));
 	   
-		dbcollection.updateMulti(new BasicDBObject("_id.dstgroup", new BasicDBObject("$lte", 257).append("$gt", 11)), 
+		collAgg.updateMulti(new BasicDBObject("_id.dstgroup", new BasicDBObject("$lte", 257).append("$gt", 11)), 
 				new BasicDBObject("$set", new BasicDBObject("dstgroup", "cernet")));
-		dbcollection.updateMulti(new BasicDBObject("_id.dstgroup", 258), 
+		collAgg.updateMulti(new BasicDBObject("_id.dstgroup", 258), 
 				new BasicDBObject("$set", new BasicDBObject("dstgroup", "unicom")));
-		dbcollection.updateMulti(new BasicDBObject("_id.dstgroup", 259), 
+		collAgg.updateMulti(new BasicDBObject("_id.dstgroup", 259), 
 				new BasicDBObject("$set", new BasicDBObject("dstgroup", "telecom")));
-		dbcollection.updateMulti(new BasicDBObject("_id.dstgroup", new BasicDBObject("$gte", 260)), 
+		collAgg.updateMulti(new BasicDBObject("_id.dstgroup", new BasicDBObject("$gte", 260)), 
 				new BasicDBObject("$set", new BasicDBObject("dstgroup", "abroad")));
 			
-		dbcollection.updateMulti(new BasicDBObject("_id.app", new BasicDBObject("$ne", "http").append("$ne", "bt").append("$ne", "pplive")), 
+		collAgg.updateMulti(new BasicDBObject("_id.app", new BasicDBObject("$ne", "http").append("$ne", "bt").append("$ne", "pplive")), 
 				new BasicDBObject("$set", new BasicDBObject("app", "else")));
-		dbcollection.updateMulti(new BasicDBObject("_id.app", "http"), 
+		collAgg.updateMulti(new BasicDBObject("_id.app", "http"), 
 				new BasicDBObject("$set", new BasicDBObject("app", "http")));
-		dbcollection.updateMulti(new BasicDBObject("_id.app", "bt"), 
+		collAgg.updateMulti(new BasicDBObject("_id.app", "bt"), 
 				new BasicDBObject("$set", new BasicDBObject("app", "bt")));
-		dbcollection.updateMulti(new BasicDBObject("_id.app", "pplive"), 
+		collAgg.updateMulti(new BasicDBObject("_id.app", "pplive"), 
 				new BasicDBObject("$set", new BasicDBObject("app", "pplive")));
 		
 		
@@ -54,10 +54,10 @@ public class MapReduceAppendKeyValues {
 		DBObject query = new BasicDBObject();
 		query.put("_id.srcgroup", new BasicDBObject("$lte", 11));
 		query.put("_id.dstgroup", new BasicDBObject("$gt", 11));
-		dbcollection.mapReduce(mapFunc, reduceFunc, "TrafficMatrix-MoreAgg", query);
+		collAgg.mapReduce(mapFunc, reduceFunc, "TrafficMatrix-MoreAgg", query);
 		
 		
-		DBCollection collMoreAgg = dbpanabit.getCollection("TrafficMatrix-MoreAgg");
+		DBCollection collMoreAgg = dbPanabit.getCollection("TrafficMatrix-MoreAgg");
 		return collMoreAgg;
 	}
 }

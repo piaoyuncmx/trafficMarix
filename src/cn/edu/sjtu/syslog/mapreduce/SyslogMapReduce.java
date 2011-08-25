@@ -20,20 +20,22 @@ public class SyslogMapReduce {
 
 	}
 
-	public static DBCollection syslogMapReduce(DB dbpanabit, DBCollection dbcollection, double time) {
+	public static DBCollection syslogMapReduce(DB dbPanabit, DBCollection dbCollection, double time) {
 		// TODO: fullfill it
 		// Step 1: Call Phase 1 MapReduce -- Add Traffic
 		// Step 2: Call Phase 2 MapReduce -- Generate Traffic Matrix
-		DBCollection collAgg = MapReduceAddTraffic.addTraffic(dbpanabit, dbcollection, time);
-		DBCollection collMoreAgg = MapReduceAppendKeyValues.appendKeyValues(dbpanabit, collAgg);
-		DBCollection collTotal = MapReducePercentageCaculation.totalCaculation(dbpanabit, collMoreAgg);
-		DBCollection collMostAgg = MapReducePercentageCaculation.percentageCaculation(dbpanabit, collMoreAgg, collTotal, time);
-		DBCollection collMatrix = MapReduceTrafficMatrix.generateTrafficMatrix(dbpanabit, collMostAgg);
+		DBCollection collAgg = MapReduceAddTraffic.addTraffic(dbPanabit, dbCollection, time);
+		DBCollection collMoreAgg = MapReduceAppendKeyValues.appendKeyValues(dbPanabit, collAgg);
+		DBCollection collTotal = MapReducePercentageCaculation.totalCaculation(dbPanabit, collMoreAgg);
+		DBCollection collMostAgg = MapReducePercentageCaculation.percentageCaculation(dbPanabit, collMoreAgg, collTotal, time);
+		DBCollection collMatrix = MapReduceTrafficMatrix.generateTrafficMatrix(dbPanabit, collMostAgg);
 		
 		collAgg.drop();
 		collMoreAgg.drop();
 		collTotal.drop();
 		collMostAgg.drop();
+		
+		MapReduceRemoveOld.removeOld(dbCollection, time);
 	
 		return collMatrix;
 	}

@@ -12,7 +12,7 @@ public class MapReducePercentageCaculation {
 		
 	}
 	
-	public static DBCollection totalCaculation(DB dbpanabit, DBCollection dbcollection){
+	public static DBCollection totalCaculation(DB dbPanabit, DBCollection collMoreAgg){
 		String mapFunc = "function(){emit({srcgroup:this._id.srcgroup, dstgroup:this._id.dstgroup}, " +
 				"{totalbyte:this.value.traffic.totalbyte, conn:this.value.traffic.conn})}";
 		String reduceFunc = "function(key, vals){var n = {alltotalbyte:0, totalconn:0};" +
@@ -21,13 +21,13 @@ public class MapReducePercentageCaculation {
 				"n.totalconn += vals[i].conn;}" +
 				"return n;}";
 		DBObject query = new BasicDBObject();
-		dbcollection.mapReduce(mapFunc, reduceFunc, "TrafficMatrix-Total", query);
+		collMoreAgg.mapReduce(mapFunc, reduceFunc, "TrafficMatrix-Total", query);
 		
-		DBCollection collTotal = dbpanabit.getCollection("TrafficMatrix-Total");
+		DBCollection collTotal = dbPanabit.getCollection("TrafficMatrix-Total");
 		return collTotal;
 	}
 	
-	public static DBCollection percentageCaculation(DB dbpanabit, DBCollection collMoreAgg, DBCollection collTotal, double time){
+	public static DBCollection percentageCaculation(DB dbPanabit, DBCollection collMoreAgg, DBCollection collTotal, double time){
 		DBObject temp = collTotal.find(new BasicDBObject("_id.srcgroup", "admin").append("_id.dstgroup", "abroad")).next();
 	    collMoreAgg.updateMulti(new BasicDBObject("_id.srcgroup", "admin").append("_id.dstgroup", "abroad"), 
 	    				new BasicDBObject("$set", new BasicDBObject("total", temp)));
@@ -109,7 +109,7 @@ public class MapReducePercentageCaculation {
 		collMoreAgg.mapReduce(mapFunc, reduceFunc, "TrafficMatrix-MostAgg", query);
 		collMoreAgg.mapReduce(mapFunc, reduceFunc, "TrafficMatrix", MapReduceCommand.OutputType.MERGE, query);
 		
-		DBCollection collMostAgg = dbpanabit.getCollection("TrafficMatrix-MostAgg");
+		DBCollection collMostAgg = dbPanabit.getCollection("TrafficMatrix-MostAgg");
 		return collMostAgg;
 	}
 }

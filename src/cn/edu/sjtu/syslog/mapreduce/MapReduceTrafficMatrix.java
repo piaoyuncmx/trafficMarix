@@ -24,7 +24,7 @@ public class MapReduceTrafficMatrix {
 
 	}
 
-	public static DBCollection generateTrafficMatrix (DB dbpanabit, DBCollection collMostAgg) {
+	public static DBCollection generateTrafficMatrix (DB dbPanabit, DBCollection collMostAgg) {
 		// TODO: Fullfill the functions
 		// Step 1 : Connect to aggTraffic collection
 		// Step 2 : Generate Traffic Matrix
@@ -94,7 +94,7 @@ public class MapReduceTrafficMatrix {
 				"return n; }";
 		collMostAgg.mapReduce(mapFunc, reduceFunc, "TrafficMatrix", MapReduceCommand.OutputType.MERGE, query);
 				
-		DBCollection collMatrix = dbpanabit.getCollection("TrafficMatrix");
+		DBCollection collMatrix = dbPanabit.getCollection("TrafficMatrix");
 		return collMatrix;
 	}
 	
