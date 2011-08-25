@@ -13,7 +13,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
@@ -43,14 +42,14 @@ public class StartSyslogMapReduce {
 		 */
 		switch(args.length) {
 		case 5:
-			time = Integer.parseInt(args[4]) / 600 * 600 - 600;	// the 5th param (opitional) is UTC time
+			time = Long.parseLong(args[4]) / 600 * 600 - 600;	// the 5th param (opitional) is UTC time
 		case 4:
 			mongoIp = args[0];
 			mongoPort = Integer.parseInt(args[1]); // MongoDB Port
 			dbName = args[2]; // MongoDB Database Name
 			collectName = args[3]; // MongoDB Collection
 			if (time < 0) {
-				time = ((int)System.currentTimeMillis()) / 1000 / 600 * 600 - 600;
+				time = ((long)System.currentTimeMillis()) / 1000 / 600 * 600 - 600;
 			}
 			break;
 		default:
