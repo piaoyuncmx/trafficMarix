@@ -47,6 +47,7 @@ public class MapReduceAddTraffic {
 				"n.conn += vals[i].traffic.conn;}" +
 				"return {\"traffic\":n}; }";
 		DBObject query = new BasicDBObject();
+		query.put("starttime", new BasicDBObject("$lte", time+600));
 		query.put("endtime", new BasicDBObject("$gt", time));
 		dbcollection.mapReduce(mapFunc, reduceFunc, "TrafficMatrix-Agg", query);
 

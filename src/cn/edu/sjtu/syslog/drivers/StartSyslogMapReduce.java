@@ -9,8 +9,11 @@ import java.net.UnknownHostException;
 
 import cn.edu.sjtu.syslog.mapreduce.SyslogMapReduce;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
@@ -66,8 +69,17 @@ public class StartSyslogMapReduce {
 			// TODO: Remove the debug output
 			System.out.println("Processing traffic starting at UTCSecond: " + time);
 			
+			DBCursor ite = mongoCollection.find(new BasicDBObject("starttime", new BasicDBObject("$lte", time+600)).
+					append("endtime", new BasicDBObject("$gt", time)));
+			System.out.println("Number of total documents processed: "+ite.count());
+			
 			/* Call MapReduce Functions */
+			long startTime = System.currentTimeMillis();
 			SyslogMapReduce.syslogMapReduce(dbPanabit, mongoCollection, time);
+			long endTime = System.currentTimeMillis();
+			
+
+			System.out.println("Time used : "+(endTime - startTime)/1000 + "s");
 			
 		} catch (MongoException e) {
 			e.printStackTrace();
